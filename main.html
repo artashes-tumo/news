@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body id="main-page">
+  <button id="theme-toggle">🌙</button>
+
+  <header id="site-header">
+    <div class="header-inner">
+      <h1 class="site-title"><span class="highlight">Latest</span> News</h1>
+      <p class="site-tagline">Your daily dose of the latest headlines</p>
+    </div>
+  </header>
+
+  <section id="search-section">
+    <form id="search-form">
+      <input type="text" id="search-input" placeholder="Search news...">
+      <button type="submit" id="search-btn">Search</button>
+    </form>
+  </section>
+
+  <main id="news-container" class="news-grid">
+    <div id="loading" style="display: none; text-align: center; padding: 20px;">Loading news...</div>
+    <!-- Dynamic news cards will be inserted here -->
+  </main>
+
+  <div id="pagination" class="pagination">
+    <button id="prev-page" disabled>Previous</button>
+    <span id="page-info"></span>
+    <button id="next-page">Next</button>
+  </div>
+
+  <footer id="site-footer">
+    <p>&copy; 2025 News Hub. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+/* ==============================
+   Reset & Base Styles
+============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background: #fefefe;
+  color: #222;
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
+body.dark {
+  background: #1e1e1e;
+  color: #eee;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+/* ==============================
+   Theme Toggle Button
+============================== */
+#theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+  background: #0077ff;
+  color: #fff;
+  padding: 0.4rem 0.7rem;
+  border-radius: 50%;
+  transition: transform 0.3s ease, background 0.3s ease;
+  z-index: 1000;
+}
+
+#theme-toggle:hover {
+  transform: rotate(20deg);
+}
+
+body.dark #theme-toggle {
+  background: #ff9f1c;
+  color: #222;
+}
+
+/* ==============================
+   Header
+============================== */
+header {
+  text-align: center;
+  padding: 2rem 1rem 1rem 1rem;
+}
+
+.site-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: #0077ff;
+}
+
+.highlight {
+  color: #ff5722;
+}
+
+.site-tagline {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+body.dark .site-tagline {
+  color: #ccc;
+}
+
+/* ==============================
+   Search Section
+============================== */
+#search-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+#search-form {
+  display: flex;
+  width: 90%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+body.dark #search-form {
+  background: rgba(50,50,50,0.7);
+  backdrop-filter: blur(8px);
+}
+
+#search-input {
+  flex: 1;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 50px 0 0 50px;
+  border: none;
+  background: transparent;
+  color: inherit;
+}
+
+#search-input::placeholder {
+  color: #999;
+}
+
+body.dark #search-input::placeholder {
+  color: #ccc;
+}
+
+#search-btn {
+  background: #0077ff;
+  color: #fff;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  border-radius: 0 50px 50px 0;
+  transition: background 0.3s ease;
+}
+
+#search-btn:hover {
+  background: #005bb5;
+}
+
+body.dark #search-btn {
+  background: #ff9f1c;
+}
+
+body.dark #search-btn:hover {
+  background: #cc7f00;
+}
+
+/* ==============================
+   News Grid (Main Page)
+============================== */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 0 1rem 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.news-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+body.dark .news-card {
+  background: rgba(50,50,50,0.8);
+}
+
+.news-card img.news-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.news-card h2.news-title {
+  font-size: 1.2rem;
+  margin: 0.7rem 1rem 0.3rem 1rem;
+  color: #0077ff;
+}
+
+body.dark .news-card h2.news-title {
+  color: #ff9f1c;
+}
+
+.news-card p.news-summary {
+  font-size: 0.95rem;
+  margin: 0 1rem 1rem 1rem;
+  color: #555;
+}
+
+body.dark .news-card p.news-summary {
+  color: #ccc;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* ==============================
+   Loading Indicator
+============================== */
+#loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 1rem;
+  color: #555;
+  grid-column: 1 / -1;
+}
+
+body.dark #loading {
+  color: #ccc;
+}
+
+/* ==============================
+   Error/No Results Message
+============================== */
+.news-grid p {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+  padding: 1rem;
+}
+
+body.dark .news-grid p {
+  color: #ccc;
+}
+
+/* ==============================
+   Pagination
+============================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.pagination button {
+  background: #0077ff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #005bb5;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+body.dark .pagination button {
+  background: #ff9f1c;
+}
+
+body.dark .pagination button:hover:not(:disabled) {
+  background: #cc7f00;
+}
+
+body.dark .pagination button:disabled {
+  background: #555;
+}
+
+#page-info {
+  font-size: 1rem;
+  color: #555;
+}
+
+body.dark #page-info {
+  color: #ccc;
+}
+
+/* ==============================
+   Footer
+============================== */
+#site-footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+body.dark #site-footer {
+  color: #ccc;
+}
+
+/* ==============================
+   Responsive
+============================== */
+@media (max-width: 768px) {
+  .news-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  #search-form {
+    flex-direction: column;
+  }
+
+  #search-input,
+  #search-btn {
+    border-radius: 50px;
+    width: 100%;
+  }
+
+  #search-btn {
+    margin-top: 0.5rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
