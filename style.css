@@ -7,6 +7,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  --text-color: #0077ff;
+  --accent-color: #ff5722;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -84,70 +89,35 @@ body.dark .site-tagline {
 }
 
 /* ==============================
-   Search Section
+   NavBar
 ============================== */
-#search-section {
+.nav-bar {
   display: flex;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-top: 10px;
 }
 
-#search-form {
-  display: flex;
-  width: 90%;
-  max-width: 500px;
-  background: #fff;
-  border-radius: 50px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  overflow: hidden;
+.nav-bar a {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text-color);
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-body.dark #search-form {
-  background: rgba(50,50,50,0.7);
-  backdrop-filter: blur(8px);
-}
-
-#search-input {
-  flex: 1;
-  padding: 0.8rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 50px 0 0 50px;
-  border: none;
-  background: transparent;
-  color: inherit;
-}
-
-#search-input::placeholder {
-  color: #999;
-}
-
-body.dark #search-input::placeholder {
-  color: #ccc;
-}
-
-#search-btn {
-  background: #0077ff;
+.nav-bar a:hover {
+  background: var(--accent-color);
   color: #fff;
-  padding: 0 1.5rem;
-  font-size: 1rem;
-  border-radius: 0 50px 50px 0;
-  transition: background 0.3s ease;
 }
 
-#search-btn:hover {
-  background: #005bb5;
-}
-
-body.dark #search-btn {
-  background: #ff9f1c;
-}
-
-body.dark #search-btn:hover {
-  background: #cc7f00;
+.nav-bar a.active {
+  background: var(--accent-color);
+  color: #fff;
 }
 
 /* ==============================
-   News Grid (Main Page)
+   News Grid
 ============================== */
 .news-grid {
   display: grid;
@@ -288,14 +258,14 @@ body.dark #page-info {
 /* ==============================
    Footer
 ============================== */
-#site-footer {
+.site-footer {
   text-align: center;
   padding: 1rem;
   font-size: 0.9rem;
   color: #555;
 }
 
-body.dark #site-footer {
+body.dark .site-footer {
   color: #ccc;
 }
 
@@ -309,62 +279,8 @@ body.dark #site-footer {
 }
 
 @media (max-width: 480px) {
-  #search-form {
-    flex-direction: column;
-  }
-
-  #search-input,
-  #search-btn {
-    border-radius: 50px;
-    width: 100%;
-  }
-
-  #search-btn {
-    margin-top: 0.5rem;
-  }
-
   .pagination {
     flex-direction: column;
     gap: 0.5rem;
   }
-}
-
-
-/* NavBar */
-
-.nav-bar {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.nav-bar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  gap: 15px;
-}
-
-.nav-bar li {
-  display: inline;
-}
-
-.nav-link {
-  text-decoration: none;
-  font-weight: 600;
-  color: var(--text-color);
-  padding: 8px 14px;
-  border-radius: 8px;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-.nav-link:hover {
-  background: var(--accent-color);
-  color: #fff;
-}
-
-.nav-link.active {
-  background: var(--accent-color);
-  color: #fff;
 }
