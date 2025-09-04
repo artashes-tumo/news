@@ -45,7 +45,7 @@ button {
   top: 20px;
   right: 20px;
   font-size: 1.5rem;
-  background: #0077ff;
+  background: var(--text-color);
   color: #fff;
   padding: 0.4rem 0.7rem;
   border-radius: 35%;
@@ -63,20 +63,50 @@ body.dark #theme-toggle {
 }
 
 /* ==============================
+   Language Dropdown
+============================== */
+#language-select {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: var(--text-color);
+  z-index: 1000;
+  appearance: none; /* Remove default arrow in some browsers */
+  cursor: pointer;
+}
+
+body.dark #language-select {
+  background: #2e2e2e;
+  border-color: #444;
+  color: #ff9f1c;
+}
+
+/* ==============================
    Header
 ============================== */
-header {
+.site-header {
   text-align: center;
-  padding: 2rem 1rem 1rem 1rem;
+  padding: 4rem 1rem 1rem;
+  position: relative;
+  z-index: 900;
+}
+
+.header-inner {
+  margin-bottom: 1rem;
 }
 
 .site-title {
   font-size: clamp(2rem, 5vw, 3rem);
-  color: #0077ff;
+  color: var(--text-color);
 }
 
 .highlight {
-  color: #ff5722;
+  color: var(--accent-color);
 }
 
 .site-tagline {
@@ -95,6 +125,8 @@ body.dark .site-tagline {
   display: flex;
   justify-content: center;
   margin-top: 10px;
+  padding: 0.5rem 0;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .nav-bar a {
@@ -104,16 +136,85 @@ body.dark .site-tagline {
   padding: 8px 14px;
   border-radius: 8px;
   transition: background 0.3s ease, color 0.3s ease;
+  margin: 0 5px; /* Space between links */
 }
 
-.nav-bar a:hover {
-  background: var(--accent-color);
-  color: #fff;
-}
-
+.nav-bar a:hover,
 .nav-bar a.active {
   background: var(--accent-color);
   color: #fff;
+}
+
+/* Add active state dynamically via JavaScript if needed */
+body.dark .nav-bar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .nav-bar a:hover,
+body.dark .nav-bar a.active {
+  background: #ff9f1c;
+}
+
+/* ==============================
+   Search Section
+============================== */
+#search-section {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+#search-section form {
+  display: flex;
+  width: 90%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+body.dark #search-section form {
+  background: rgba(50, 50, 50, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+#search-input {
+  flex: 1;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+}
+
+#search-input::placeholder {
+  color: #999;
+}
+
+body.dark #search-input::placeholder {
+  color: #ccc;
+}
+
+#search-btn {
+  background: var(--text-color);
+  color: #fff;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  border-radius: 0 50px 50px 0;
+  transition: background 0.3s ease;
+}
+
+#search-btn:hover {
+  background: #005bb5;
+}
+
+body.dark #search-btn {
+  background: #ff9f1c;
+}
+
+body.dark #search-btn:hover {
+  background: #cc7f00;
 }
 
 /* ==============================
@@ -123,7 +224,7 @@ body.dark .site-tagline {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
-  padding: 0 1rem 2rem 1rem;
+  padding: 0 1rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -132,14 +233,14 @@ body.dark .site-tagline {
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
 }
 
 body.dark .news-card {
-  background: rgba(50,50,50,0.8);
+  background: rgba(50, 50, 50, 0.8);
 }
 
 .news-card img.news-image {
@@ -150,8 +251,8 @@ body.dark .news-card {
 
 .news-card h2.news-title {
   font-size: 1.2rem;
-  margin: 0.7rem 1rem 0.3rem 1rem;
-  color: #0077ff;
+  margin: 0.7rem 1rem 0.3rem;
+  color: var(--text-color);
 }
 
 body.dark .news-card h2.news-title {
@@ -160,7 +261,7 @@ body.dark .news-card h2.news-title {
 
 .news-card p.news-summary {
   font-size: 0.95rem;
-  margin: 0 1rem 1rem 1rem;
+  margin: 0 1rem 1rem;
   color: #555;
 }
 
@@ -170,7 +271,7 @@ body.dark .news-card p.news-summary {
 
 .news-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* ==============================
@@ -182,6 +283,7 @@ body.dark .news-card p.news-summary {
   font-size: 1rem;
   color: #555;
   grid-column: 1 / -1;
+  display: none; /* Hidden by default, shown via JS */
 }
 
 body.dark #loading {
@@ -217,7 +319,7 @@ body.dark .news-grid p {
 }
 
 .pagination button {
-  background: #0077ff;
+  background: var(--text-color);
   color: #fff;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -276,11 +378,35 @@ body.dark .site-footer {
   .news-grid {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
+
+  .nav-bar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-bar a {
+    margin: 5px 0;
+  }
 }
 
 @media (max-width: 480px) {
   .pagination {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  #search-section form {
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  #search-input,
+  #search-btn {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  #search-btn {
+    margin-top: 0.5rem;
   }
 }

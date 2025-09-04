@@ -1,66 +1,95 @@
-const newsContainer = document.getElementById("news-container");
-const loading = document.getElementById("loading");
-const pageInfo = document.getElementById("page-info");
-const prevPageBtn = document.getElementById("prev-page");
-const nextPageBtn = document.getElementById("next-page");
-const themeToggle = document.getElementById("theme-toggle");
-
+// Your GNews API key
 const API_KEY = '234b819cfb481db6fb290020fa2d9cf0';
 const BASE_URL = 'https://gnews.io/api/v4';
 
-let currentPage = 1;
-let currentCategory = "general";
+// Elements
+const newsContainer = document.getElementById('news-container');
+const searchForm = document.querySelector('#search-section form');
+const searchInput = document.getElementById('search-input');
+const loading = document.getElementById('loading');
+const prevPageBtn = document.querySelector('.pagination #prev-page');
+const nextPageBtn = document.querySelector('.pagination #next-page');
+const pageInfo = document.querySelector('.pagination #page-info');
+const languageSelect = document.getElementById('language-select');
+const themeToggle = document.getElementById('theme-toggle');
 
-// Detect category from <body id="">
-switch (document.body.id) {
-  case "home-page": currentCategory = "general"; break;
-  case "breaking-page": currentCategory = "general"; break; // Use search for breaking if needed
-  case "sports-page": currentCategory = "sports"; break;
-  case "technology-page": currentCategory = "technology"; break;
-  case "world-page": currentCategory = "world"; break;
+console.log('Language Select initialized:', languageSelect); // Debug initialization
+
+// State
+let currentPage = 1;
+let currentQuery = ''; // Tracks search query
+let currentLang = 'en'; // Default language
+let currentCategory = 'general'; // Default category
+let totalPages = 1; // Updated based on totalArticles
+
+// Detect category from body id
+function detectCategory() {
+  const bodyId = document.body.id;
+  console.log('Detected body id:', bodyId); // Debug category
+  switch (bodyId) {
+    case 'home-page': return 'general';
+    case 'breaking-page': return 'general'; // Use search for breaking
+    case 'sports-page': return 'sports';
+    case 'technology-page': return 'technology';
+    case 'world-page': return 'world';
+    default: return 'general';
+  }
 }
 
 // Load saved theme on page load
-document.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark");
-    themeToggle.textContent = "☀️";
+document.addEventListener('DOMContentLoaded', () => {
+  currentCategory = detectCategory();
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+    themeToggle.textContent = '☀️';
   } else {
-    document.body.classList.remove("dark");
-    themeToggle.textContent = "🌙";
+    document.body.classList.remove('dark');
+    themeToggle.textContent = '🌙';
   }
+  console.log('Initial category:', currentCategory); // Debug initial state
+  fetchNews(currentPage); // Load news based on category
 });
 
 // Theme toggle with persistence
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  if (document.body.classList.contains("dark")) {
-    themeToggle.textContent = "☀️";
-    localStorage.setItem("theme", "dark");
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  if (document.body.classList.contains('dark')) {
+    themeToggle.textContent = '☀️';
+    localStorage.setItem('theme', 'dark');
   } else {
-    themeToggle.textContent = "🌙";
-    localStorage.setItem("theme", "light");
+    themeToggle.textContent = '🌙';
+    localStorage.setItem('theme', 'light');
   }
 });
 
 // Fetch news
 async function fetchNews(page = 1) {
-  loading.style.display = "block";
-  newsContainer.innerHTML = "";
+  loading.style.display = 'block';
+  newsContainer.innerHTML = '';
+
+  let url;
+  if (currentQuery && currentCategory === 'general' && document.body.id === 'breaking-page') {
+    url = `${BASE_URL}/search?q=${encodeURIComponent(currentQuery || 'breaking')}&lang=${currentLang}&page=${page}&apikey=${API_KEY}`;
+  } else if (currentQuery) {
+    url = `${BASE_URL}/search?q=${encodeURIComponent(currentQuery)}&category=${currentCategory}&lang=${currentLang}&page=${page}&apikey=${API_KEY}`;
+  } else if (currentCategory === 'general' && document.body.id === 'breaking-page') {
+    url = `${BASE_URL}/search?q=breaking&lang=${currentLang}&page=${page}&apikey=${API_KEY}`;
+  } else {
+    url = `${BASE_URL}/top-headlines?category=${currentCategory}&lang=${currentLang}&page=${page}&apikey=${API_KEY}`;
+  }
+  console.log('Fetch URL:', url); // Debug URL
 
   try {
-    const url = currentCategory === "general" && document.body.id === "breaking-page"
-      ? `${BASE_URL}/search?q=breaking&lang=en&page=${page}&apikey=${API_KEY}`
-      : `${BASE_URL}/top-headlines?category=${currentCategory}&lang=en&page=${page}&apikey=${API_KEY}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
     const data = await res.json();
+    console.log('API Response:', JSON.stringify(data, null, 2)); // Debug response
 
     if (data.articles && data.articles.length > 0) {
       data.articles.forEach(article => {
-        const card = document.createElement("div");
-        card.className = "news-card";
+        const card = document.createElement('div');
+        card.className = 'news-card';
         card.innerHTML = `
           <img src="${article.image || 'https://via.placeholder.com/400x200'}" alt="news image" class="news-image">
           <h2 class="news-title"><a href="${article.url}" target="_blank">${article.title}</a></h2>
@@ -68,30 +97,63 @@ async function fetchNews(page = 1) {
         `;
         newsContainer.appendChild(card);
       });
+      totalPages = Math.ceil((data.totalResults || 100) / 10) || 1; // Assuming 10 per page
+      currentPage = page;
+      updatePagination();
     } else {
-      newsContainer.innerHTML = `<p>No articles found for this category.</p>`;
+      newsContainer.innerHTML = `<p>No articles found for ${currentCategory} in ${currentLang}.</p>`;
+      totalPages = 1;
+      currentPage = 1;
+      updatePagination();
     }
-    pageInfo.textContent = `Page ${page}`;
-    prevPageBtn.disabled = page === 1;
-    nextPageBtn.disabled = data.articles.length === 0 || (data.totalArticles && page * 10 >= data.totalArticles);
   } catch (err) {
-    console.error("Error fetching news:", err);
+    console.error('Error fetching news:', err);
     newsContainer.innerHTML = `<p>Error loading news: ${err.message}</p>`;
+    totalPages = 1;
+    currentPage = 1;
+    updatePagination();
   } finally {
-    loading.style.display = "none";
+    loading.style.display = 'none';
   }
 }
 
-prevPageBtn?.addEventListener("click", () => {
+// Update pagination
+function updatePagination() {
+  if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+  if (nextPageBtn) nextPageBtn.disabled = currentPage >= totalPages;
+}
+
+searchForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  currentQuery = searchInput.value.trim();
+  if (currentQuery) {
+    currentPage = 1;
+    fetchNews(currentPage);
+  } else {
+    newsContainer.innerHTML = '<p>Please enter a search term.</p>';
+    if (loading) loading.style.display = 'none';
+    totalPages = 1;
+    currentPage = 1;
+    updatePagination();
+  }
+});
+
+prevPageBtn.addEventListener('click', () => {
   if (currentPage > 1) {
     currentPage--;
     fetchNews(currentPage);
   }
 });
 
-nextPageBtn?.addEventListener("click", () => {
+nextPageBtn.addEventListener('click', () => {
   currentPage++;
   fetchNews(currentPage);
 });
 
-fetchNews(currentPage);
+languageSelect.addEventListener('change', (e) => {
+  console.log('Language changed to:', e.target.value); // Debug change
+  currentLang = e.target.value;
+  currentPage = 1;
+  fetchNews(currentPage);
+});
