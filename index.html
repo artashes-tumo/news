@@ -3,55 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>News Hub</title>
-  <link rel="stylesheet" href="style.css">
+  <title>News Hub - Home</title>
+  <link rel="stylesheet" href="professional.css" id="theme-stylesheet">
 </head>
 <body id="home-page">
+  <div class="idk">
   <button id="theme-toggle">🌙</button>
-  <select name="language" id="language-select">
+  <select id="language-select">
     <option value="en">English</option>
     <option value="fr">French</option>
     <option value="de">German</option>
+    <option value="el">Greek</option>
+    <option value="it">Italian</option>
+    <option value="es">Spanish</option>
     <option value="pt">Portuguese</option>
     <option value="ru">Russian</option>
-    <option value="it">Italian</option>
+    <option value="zh">Chinese</option>
+    <option value="ja">Japanese</option>
     <option value="ar">Arabic</option>
-    <option value="es">Spanish</option>
   </select>
-
+  <button id="style-toggle">🎨 Switch Theme</button>
+</div>
   <header class="site-header">
     <div class="header-inner">
-      <h1 class="site-title"><span class="highlight">Latest</span> News</h1>
+      <h1 class="site-title">Latest <span class="highlight">News</span></h1>
       <p class="site-tagline">Your daily dose of top headlines</p>
     </div>
-    <nav class="nav-bar">
-      <a href="index.html">Home</a>
-      <a href="breaking/">Breaking</a>
-      <a href="sports/">Sports</a>
-      <a href="technology/">Technology</a>
-      <a href="world/">World</a>
-    </nav>
   </header>
 
+  <nav class="nav-bar">
+    <a href="index.html" class="active">Home</a>
+    <a href="breaking/index.html">Breaking</a>
+    <a href="sports/index.html">Sports</a>
+    <a href="technology/index.html">Technology</a>
+    <a href="world/index.html">World</a>
+  </nav>
+
   <section id="search-section">
-    <form id="search-form">
-      <input type="text" id="search-input" placeholder="Search news...">
+    <form>
+      <input type="text" id="search-input" placeholder="Search">
       <button type="submit" id="search-btn">Search</button>
     </form>
   </section>
 
-  <main id="news-container" class="news-grid">
-    <div id="loading">Loading news...</div>
-  </main>
+  <section class="news-grid" id="news-container">
+    <p id="loading">Loading news...</p>
+  </section>
 
   <div class="pagination">
-    <button id="prev-page" disabled>Previous</button>
+    <button id="prev-page">Previous</button>
     <span id="page-info">Page 1</span>
     <button id="next-page">Next</button>
   </div>
 
   <footer class="site-footer">
-    <p>&copy; 2025 News Hub. All rights reserved.</p>
+    <p>© 2025 News Hub. All rights reserved.</p>
   </footer>
 
   <script src="script.js"></script>

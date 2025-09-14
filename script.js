@@ -1,4 +1,4 @@
-// Your GNews API key
+// API key
 const API_KEY = '234b819cfb481db6fb290020fa2d9cf0';
 const BASE_URL = 'https://gnews.io/api/v4';
 
@@ -10,10 +10,7 @@ const loading = document.getElementById('loading');
 const prevPageBtn = document.querySelector('.pagination #prev-page');
 const nextPageBtn = document.querySelector('.pagination #next-page');
 const pageInfo = document.querySelector('.pagination #page-info');
-const languageSelect = document.getElementById('language-select');
 const themeToggle = document.getElementById('theme-toggle');
-
-console.log('Language Select initialized:', languageSelect); // Debug initialization
 
 // State
 let currentPage = 1;
@@ -36,7 +33,7 @@ function detectCategory() {
   }
 }
 
-// Load saved theme on page load
+// Load saved theme and initialize language select on page load
 document.addEventListener('DOMContentLoaded', () => {
   currentCategory = detectCategory();
   const savedTheme = localStorage.getItem('theme');
@@ -48,6 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggle.textContent = '🌙';
   }
   console.log('Initial category:', currentCategory); // Debug initial state
+
+  // Initialize language select
+  const languageSelect = document.getElementById('language-select');
+  console.log('Language Select initialized:', languageSelect); // Debug initialization
+  if (languageSelect) {
+    languageSelect.addEventListener('change', (e) => {
+      console.log('Language changed to:', e.target.value); // Debug change
+      currentLang = e.target.value;
+      currentPage = 1;
+      fetchNews(currentPage);
+    });
+  } else {
+    console.error('Language select element not found');
+  }
+
   fetchNews(currentPage); // Load news based on category
 });
 
@@ -61,6 +73,18 @@ themeToggle.addEventListener('click', () => {
     themeToggle.textContent = '🌙';
     localStorage.setItem('theme', 'light');
   }
+});
+
+// Theme switch logic
+const styleToggle = document.getElementById('style-toggle');
+const themeStylesheet = document.getElementById('theme-stylesheet');
+
+let currentTheme = 'professional'; // Default
+
+styleToggle.addEventListener('click', () => {
+  currentTheme = currentTheme === 'professional' ? 'fun' : 'professional';
+  themeStylesheet.href = `${currentTheme}.css`;
+  styleToggle.textContent = currentTheme === 'professional' ? '🎨 Fun Theme' : '💼 Professional Theme';
 });
 
 // Fetch news
@@ -124,20 +148,22 @@ function updatePagination() {
   if (nextPageBtn) nextPageBtn.disabled = currentPage >= totalPages;
 }
 
-searchForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  currentQuery = searchInput.value.trim();
-  if (currentQuery) {
-    currentPage = 1;
-    fetchNews(currentPage);
-  } else {
-    newsContainer.innerHTML = '<p>Please enter a search term.</p>';
-    if (loading) loading.style.display = 'none';
-    totalPages = 1;
-    currentPage = 1;
-    updatePagination();
-  }
-});
+if (searchForm) {
+  searchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    currentQuery = searchInput.value.trim();
+    if (currentQuery) {
+      currentPage = 1;
+      fetchNews(currentPage);
+    } else {
+      newsContainer.innerHTML = '<p>Please enter a search term.</p>';
+      if (loading) loading.style.display = 'none';
+      totalPages = 1;
+      currentPage = 1;
+      updatePagination();
+    }
+  });
+}
 
 prevPageBtn.addEventListener('click', () => {
   if (currentPage > 1) {
@@ -148,12 +174,5 @@ prevPageBtn.addEventListener('click', () => {
 
 nextPageBtn.addEventListener('click', () => {
   currentPage++;
-  fetchNews(currentPage);
-});
-
-languageSelect.addEventListener('change', (e) => {
-  console.log('Language changed to:', e.target.value); // Debug change
-  currentLang = e.target.value;
-  currentPage = 1;
   fetchNews(currentPage);
 });
