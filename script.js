@@ -83,7 +83,13 @@ let currentTheme = 'professional'; // Default
 
 styleToggle.addEventListener('click', () => {
   currentTheme = currentTheme === 'professional' ? 'fun' : 'professional';
-  themeStylesheet.href = `${currentTheme}.css`;
+  const isSubPage = window.location.pathname.includes('/breaking/') ||
+                    window.location.pathname.includes('/sports/') ||
+                    window.location.pathname.includes('/technology/') ||
+                    window.location.pathname.includes('/world/');
+  const pathPrefix = isSubPage ? '../' : '';
+  themeStylesheet.href = `${pathPrefix}${currentTheme}.css`;
+  console.log('New stylesheet URL:', themeStylesheet.href); // Debug log
   styleToggle.textContent = currentTheme === 'professional' ? '🎨 Fun Theme' : '💼 Professional Theme';
 });
 
