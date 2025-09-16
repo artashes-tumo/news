@@ -1,8 +1,8 @@
 /* ==============================
    Professional Theme: Clean, Minimal, Modern
-============================== */
+============================= */
 
-/* Reset & Base */
+/* Base Reset & Variables (Consolidated) */
 *,
 *::before,
 *::after {
@@ -29,7 +29,6 @@ body.dark {
   color: #ecf0f1;
 }
 
-/* Variables */
 :root {
   --primary-color: #3498db;
   --primary-dark: #2980b9;
@@ -203,48 +202,16 @@ input:focus, select:focus { outline: none; border-color: var(--primary-color); b
   white-space: nowrap;
 }
 
-#theme-toggle {
-  order: 2;
-}
-
-#language-select {
-  order: 1;
-}
-
-#style-toggle {
-  order: 3;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .toggle-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-xs);
-  }
-
-  #theme-toggle,
-  #language-select,
-  #style-toggle {
-    width: 100%;
-    text-align: center;
-    font-size: 0.875rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-}
-
-@media (max-width: 480px) {
-  .toggle-container {
-    top: var(--spacing-sm);
-  }
-}
+#theme-toggle { order: 2; }
+#language-select { order: 1; }
+#style-toggle { order: 3; }
 
 /* Logo */
 .Logo-Image {
-  max-width: 150px; /* Default max width for desktop */
-  height: auto; /* Maintain aspect ratio */
-  margin-bottom: var(--spacing-sm); /* Space below logo */
-  transition: transform var(--transition), opacity var(--transition); /* Smooth hover effect */
+  max-width: 150px;
+  height: auto;
+  margin-bottom: var(--spacing-sm);
+  transition: transform var(--transition), opacity var(--transition);
 }
 
 .site-header .header-inner {
@@ -255,34 +222,27 @@ input:focus, select:focus { outline: none; border-color: var(--primary-color); b
 }
 
 @media (min-width: 769px) {
-  .Logo-Image {
-    max-width: 200px; /* Larger on desktop */
-  }
-
-  .site-header .header-inner {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-md); /* Space between logo and title */
-  }
+  .Logo-Image { max-width: 200px; }
+  .site-header .header-inner { flex-direction: row; align-items: center; justify-content: center; gap: var(--spacing-md); }
 }
 
 @media (max-width: 768px) {
-  .Logo-Image {
-    max-width: 120px; /* Smaller on tablet */
-  }
+  .Logo-Image { max-width: 120px; }
+  .toggle-container { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); }
+  #theme-toggle, #language-select, #style-toggle { width: 100%; text-align: center; font-size: 0.875rem; padding: var(--spacing-xs) var(--spacing-sm); }
+  .nav-bar { flex-direction: column; align-items: center; }
+  .news-grid { grid-template-columns: 1fr; }
+  #search-section form { flex-direction: column; }
+  #search-btn { border-radius: 0; }
 }
 
 @media (max-width: 480px) {
-  .Logo-Image {
-    max-width: 100px; /* Even smaller on mobile */
-  }
+  .toggle-container { top: var(--spacing-sm); }
+  .site-title { font-size: 2rem; }
+  .Logo-Image { max-width: 100px; }
 }
 
-.Logo-Image:hover {
-  transform: scale(1.05); /* Slight zoom on hover */
-  opacity: 0.9; /* Subtle fade */
-}
+.Logo-Image:hover { transform: scale(1.05); opacity: 0.9; }
 
 /* Video Section */
 #video-section {
@@ -321,7 +281,7 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Pagination */
+/* Pagination Overrides */
 .pagination button {
   background-color: #ffffff;
   border: 1px solid #e9ecef;
