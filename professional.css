@@ -283,3 +283,52 @@ input:focus, select:focus { outline: none; border-color: var(--primary-color); b
   transform: scale(1.05); /* Slight zoom on hover */
   opacity: 0.9; /* Subtle fade */
 }
+
+/* Video Section */
+#video-section {
+  margin: 30px 0;
+  text-align: center;
+}
+
+#video-section iframe {
+  width: 100%;
+  max-width: 800px;
+  height: 450px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* News Grid Adjustments */
+.news-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 20px;
+  padding: 40px 20px;
+}
+
+/* Buttons */
+button {
+  background-color: #3498db;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination button {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  color: #2c3e50;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #3498db;
+  color: #fff;
+}

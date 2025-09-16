@@ -384,3 +384,61 @@ input:focus, select:focus {
   70% { transform: scale(0.9); }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* Video Section */
+#video-section {
+  margin: 30px 0;
+  text-align: center;
+}
+
+#video-section iframe {
+  width: 100%;
+  max-width: 800px;
+  height: 450px;
+  border-radius: 25px;
+  box-shadow: 0 8px 25px rgba(255,107,107,0.4);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+#video-section iframe:hover {
+  transform: scale(1.05) rotate(1deg);
+  box-shadow: 0 12px 35px rgba(255,107,107,0.6);
+}
+
+/* News Grid Adjustments */
+.news-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 25px;
+  padding: 50px 20px;
+}
+
+/* Buttons */
+button {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  color: #fff;
+  border-radius: 20px;
+  padding: 12px 25px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.1) rotate(2deg);
+  box-shadow: 0 8px 25px rgba(255,107,107,0.5);
+}
+
+/* Pagination */
+.pagination button {
+  background: linear-gradient(45deg, #4ecdc4, #ffe66d);
+  border-radius: 15px;
+  color: #2c1810;
+  font-weight: bold;
+  padding: 10px 20px;
+  transition: transform 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  transform: scale(1.1);
+}

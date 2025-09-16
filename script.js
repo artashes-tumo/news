@@ -182,3 +182,29 @@ nextPageBtn.addEventListener('click', () => {
   currentPage++;
   fetchNews(currentPage);
 });
+
+    let player;
+    let lastScrollY = window.scrollY;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player("player", {
+        events: {
+          onReady: onPlayerReady
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      window.addEventListener("scroll", function () {
+        let newScrollY = window.scrollY;
+        if (!player) return;
+
+        if (newScrollY > lastScrollY) {
+          player.pauseVideo();
+        } else if (newScrollY < lastScrollY) {
+          player.playVideo();
+        }
+
+        lastScrollY = newScrollY;
+      });
+    }
