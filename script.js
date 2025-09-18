@@ -46,6 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   console.log('Initial category:', currentCategory); // Debug initial state
 
+  const menuToggle = document.getElementById('menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+  }
   // Initialize language select
   const languageSelect = document.getElementById('language-select');
   console.log('Language Select initialized:', languageSelect); // Debug initialization
@@ -84,9 +91,9 @@ let currentTheme = 'professional'; // Default
 styleToggle.addEventListener('click', () => {
   currentTheme = currentTheme === 'professional' ? 'fun' : 'professional';
   const isSubPage = window.location.pathname.includes('/breaking/') ||
-                    window.location.pathname.includes('/sports/') ||
-                    window.location.pathname.includes('/technology/') ||
-                    window.location.pathname.includes('/world/');
+    window.location.pathname.includes('/sports/') ||
+    window.location.pathname.includes('/technology/') ||
+    window.location.pathname.includes('/world/');
   const pathPrefix = isSubPage ? '../' : '';
   themeStylesheet.href = `${pathPrefix}${currentTheme}.css`;
   console.log('New stylesheet URL:', themeStylesheet.href); // Debug log
@@ -183,28 +190,28 @@ nextPageBtn.addEventListener('click', () => {
   fetchNews(currentPage);
 });
 
-    let player;
-    let lastScrollY = window.scrollY;
+let player;
+let lastScrollY = window.scrollY;
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player("player", {
-        events: {
-          onReady: onPlayerReady
-        }
-      });
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("player", {
+    events: {
+      onReady: onPlayerReady
+    }
+  });
+}
+
+function onPlayerReady(event) {
+  window.addEventListener("scroll", function () {
+    let newScrollY = window.scrollY;
+    if (!player) return;
+
+    if (newScrollY > lastScrollY) {
+      player.pauseVideo();
+    } else if (newScrollY < lastScrollY) {
+      player.playVideo();
     }
 
-    function onPlayerReady(event) {
-      window.addEventListener("scroll", function () {
-        let newScrollY = window.scrollY;
-        if (!player) return;
-
-        if (newScrollY > lastScrollY) {
-          player.pauseVideo();
-        } else if (newScrollY < lastScrollY) {
-          player.playVideo();
-        }
-
-        lastScrollY = newScrollY;
-      });
-    }
+    lastScrollY = newScrollY;
+  });
+}
