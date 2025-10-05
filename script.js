@@ -1,8 +1,10 @@
-// API configuration
-const API_KEY = 'pub_96940c2f42d34d3bacdeb269ac1ae50d'; // Your NewsData.io key
-const BASE_URL = 'https://newsdata.io/api/1/latest';
+// Config
+const CONFIG = {
+  API_KEY: 'd4982bb50c4d6a93468a411589c5b354',
+  BASE_URL: 'https://gnews.io/api/v4',
+};
 
-// DOM elements
+// Elements
 const newsContainer = document.getElementById('news-container');
 const searchForm = document.querySelector('#search-section form');
 const searchInput = document.getElementById('search-input');
@@ -11,39 +13,139 @@ const prevPageBtn = document.querySelector('.pagination #prev-page');
 const nextPageBtn = document.querySelector('.pagination #next-page');
 const pageInfo = document.querySelector('.pagination #page-info');
 const themeToggle = document.getElementById('theme-toggle');
-const languageSelect = document.getElementById('language-select');
 const styleToggle = document.getElementById('style-toggle');
-const themeStylesheet = document.getElementById('theme-stylesheet');
+const menuToggle = document.getElementById('menu-toggle');
+const navLinks = document.querySelector('.nav-links');
 
-// Application state
+// State
 let currentPage = 1;
 let currentQuery = '';
 let currentLang = 'en';
-let currentCategory = 'top'; // Default to 'top' for general headlines
+let currentCategory = 'general';
 let totalPages = 1;
-let pageTokens = [null]; // Token stack, starting with null for page 1
-let currentIndex = 0;
+let lastScrollY = window.scrollY;
+let player;
 
-// Map body IDs to NewsData.io categories
+// Utility Functions
 function detectCategory() {
   const bodyId = document.body.id;
-  console.log('Detected body ID:', bodyId);
-  const categoryMap = {
-    'home-page': 'top',
-    'breaking-page': 'top', // Use 'top' for breaking news
-    'sports-page': 'sports',
-    'technology-page': 'technology',
-    'world-page': 'world'
-  };
-  return categoryMap[bodyId] || 'top';
+  console.log('Detected body id:', bodyId);
+  switch (bodyId) {
+    case 'home-page': return 'general';
+    case 'breaking-page': return 'general';
+    case 'sports-page': return 'sports';
+    case 'technology-page': return 'technology';
+    case 'world-page': return 'world';
+    default: return 'general';
+  }
 }
 
-// Initialize page and event listeners
+function updatePagination() {
+  if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+  if (nextPageBtn) nextPageBtn.disabled = currentPage >= totalPages;
+}
+
+// YouTube Player Functions
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("player", {
+    events: {
+      onReady: onPlayerReady,
+    }
+  });
+}
+
+function onPlayerReady(event) {
+  player.playVideo();
+  window.addEventListener("scroll", function () {
+    let newScrollY = window.scrollY;
+    if (!player) return;
+    if (newScrollY > lastScrollY) {
+      player.pauseVideo();
+    } else if (newScrollY < lastScrollY) {
+      player.playVideo();
+    }
+    lastScrollY = newScrollY;
+  });
+  addVideoControls();
+}
+
+function addVideoControls() {
+  const videoSection = document.getElementById('video-section');
+  if (!videoSection || !player) return;
+
+  const controls = document.createElement('div');
+  controls.style = 'text-align: center; margin-top: 10px;';
+  controls.innerHTML = `
+    <button id="play-btn">Play</button>
+    <button id="pause-btn">Pause</button>
+  `;
+  videoSection.appendChild(controls);
+
+  document.getElementById('play-btn').addEventListener('click', () => player.playVideo());
+  document.getElementById('pause-btn').addEventListener('click', () => player.pauseVideo());
+}
+
+// Fetch News with Retry Logic
+async function fetchNews(page = 1, retries = 2) {
+  loading.style.display = 'block';
+  newsContainer.innerHTML = '';
+
+  let url;
+  if (currentQuery && currentCategory === 'general' && document.body.id === 'breaking-page') {
+    url = `${CONFIG.BASE_URL}/search?q=${encodeURIComponent(currentQuery || 'breaking')}&lang=${currentLang}&page=${page}&apikey=${CONFIG.API_KEY}`;
+  } else if (currentQuery) {
+    url = `${CONFIG.BASE_URL}/search?q=${encodeURIComponent(currentQuery)}&category=${currentCategory}&lang=${currentLang}&page=${page}&apikey=${CONFIG.API_KEY}`;
+  } else if (currentCategory === 'general' && document.body.id === 'breaking-page') {
+    url = `${CONFIG.BASE_URL}/search?q=breaking&lang=${currentLang}&page=${page}&apikey=${CONFIG.API_KEY}`;
+  } else {
+    url = `${CONFIG.BASE_URL}/top-headlines?category=${currentCategory}&lang=${currentLang}&page=${page}&apikey=${CONFIG.API_KEY}`;
+  }
+  console.log('Fetch URL:', url);
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      const data = await res.json();
+      console.log('API Response:', JSON.stringify(data, null, 2));
+
+      if (data.articles && data.articles.length > 0) {
+        data.articles.forEach(article => {
+          const card = document.createElement('div');
+          card.className = 'news-card';
+          card.innerHTML = `
+            <img src="${article.image || 'https://via.placeholder.com/400x200'}" alt="news image" class="news-image">
+            <h2 class="news-title"><a href="${article.url}" target="_blank">${article.title}</a></h2>
+            <p class="news-summary">${article.description || 'No description available.'}</p>
+          `;
+          newsContainer.appendChild(card);
+        });
+        totalPages = Math.ceil((data.totalResults || 100) / 10) || 1;
+        currentPage = page;
+        updatePagination();
+      } else {
+        newsContainer.innerHTML = `<p>No articles found for ${currentCategory} in ${currentLang}.</p>`;
+        totalPages = 1;
+        currentPage = 1;
+        updatePagination();
+      }
+      break; // Exit loop on success
+    } catch (err) {
+      console.error(`Attempt ${attempt} failed:`, err);
+      if (attempt === retries) {
+        newsContainer.innerHTML = `<p>Error loading news: ${err.message}. Retries exhausted.</p>`;
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempt)); // Exponential backoff
+      }
+    }
+  }
+  loading.style.display = 'none';
+}
+
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
   currentCategory = detectCategory();
-  console.log('Initial category:', currentCategory);
-
-  // Set initial theme
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'dark') {
     document.body.classList.add('dark');
@@ -52,43 +154,56 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('dark');
     themeToggle.textContent = '🌙';
   }
+  console.log('Initial category:', currentCategory);
 
-  // Mobile menu toggle (add if needed: <button id="menu-toggle">☰</button>)
-  const menuToggle = document.getElementById('menu-toggle');
-  const navLinks = document.querySelector('.nav-links');
+  const languageSelect = document.getElementById('language-select');
+  if (languageSelect) {
+    languageSelect.addEventListener('change', (e) => {
+      console.log('Language changed to:', e.target.value);
+      currentLang = e.target.value;
+      currentPage = 1;
+      fetchNews(currentPage);
+    });
+  } else {
+    console.error('Language select element not found');
+  }
+
+  const themeStylesheet = document.getElementById('theme-stylesheet');
+  let currentTheme = 'professional';
+  const isSubPage = window.location.pathname.includes('/breaking/') ||
+                    window.location.pathname.includes('/sports/') ||
+                    window.location.pathname.includes('/technology/') ||
+                    window.location.pathname.includes('/world/');
+  const pathPrefix = isSubPage ? '../' : '';
+
+  styleToggle.addEventListener('click', () => {
+    currentTheme = currentTheme === 'professional' ? 'fun' : 'professional';
+    themeStylesheet.href = `${pathPrefix}${currentTheme}.css`;
+    console.log('New stylesheet URL:', themeStylesheet.href);
+    styleToggle.textContent = currentTheme === 'professional' ? '🎨 Fun Theme' : '💼 Professional Theme';
+
+    const iframe = document.getElementById('player');
+    if (iframe) {
+      if (currentTheme === 'fun') {
+        iframe.style.borderRadius = '25px';
+        iframe.style.boxShadow = '0 8px 25px rgba(255,107,107,0.4)';
+      } else {
+        iframe.style.borderRadius = '10px';
+        iframe.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+      }
+    }
+  });
+
   if (menuToggle && navLinks) {
     menuToggle.addEventListener('click', () => {
       navLinks.classList.toggle('active');
     });
   }
 
-  // Language selection with fallback
-  const supportedLanguages = ['en', 'fr', 'de', 'el', 'it', 'es', 'pt', 'ru', 'zh', 'ja', 'ar'];
-  if (languageSelect) {
-    console.log('Language select initialized:', languageSelect);
-    languageSelect.addEventListener('change', (e) => {
-      const selectedLang = e.target.value;
-      console.log('Language changed to:', selectedLang);
-      currentLang = supportedLanguages.includes(selectedLang) ? selectedLang : 'en';
-      resetPagination();
-      fetchNews();
-    });
-  } else {
-    console.error('Language select element not found');
-  }
-
-  fetchNews();
+  fetchNews(currentPage);
 });
 
-// Reset pagination state (for language or category change)
-function resetPagination() {
-  currentPage = 1;
-  currentIndex = 0;
-  pageTokens = [null];
-  totalPages = 1;
-}
-
-// Toggle theme
+// Theme Toggle
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark');
   if (document.body.classList.contains('dark')) {
@@ -100,92 +215,14 @@ themeToggle.addEventListener('click', () => {
   }
 });
 
-// Switch between professional and fun themes
-let currentTheme = 'professional';
-styleToggle.addEventListener('click', () => {
-  currentTheme = currentTheme === 'professional' ? 'fun' : 'professional';
-  const isSubPage = window.location.pathname.includes('/breaking/') ||
-    window.location.pathname.includes('/sports/') ||
-    window.location.pathname.includes('/technology/') ||
-    window.location.pathname.includes('/world/');
-  const pathPrefix = isSubPage ? '../' : '';
-  themeStylesheet.href = `${pathPrefix}${currentTheme}.css`;
-  console.log('New stylesheet URL:', themeStylesheet.href);
-  styleToggle.textContent = currentTheme === 'professional' ? '🎨 Fun Theme' : '💼 Professional Theme';
-});
-
-// Fetch news from NewsData.io
-async function fetchNews() {
-  loading.style.display = 'block';
-  newsContainer.innerHTML = '';
-
-  let url = `${BASE_URL}?category=${currentCategory}&language=${currentLang}&apikey=${API_KEY}`;
-  if (currentQuery || document.body.id === 'breaking-page') {
-    url = `${BASE_URL}?q=${encodeURIComponent(currentQuery || 'breaking')}&language=${currentLang}&apikey=${API_KEY}`;
-  }
-  const currentToken = pageTokens[currentIndex];
-  if (currentToken) {
-    url += `&page=${currentToken}`;
-  }
-  console.log('Fetch URL:', url);
-
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`HTTP error! Status: ${res.status} - ${errorText}`);
-    }
-    const data = await res.json();
-    console.log('API Response:', JSON.stringify(data, null, 2));
-
-    if (data.results && data.results.length > 0) {
-      data.results.forEach(article => {
-        const card = document.createElement('div');
-        card.className = 'news-card';
-        card.innerHTML = `
-          <img src="${article.image_url || 'https://via.placeholder.com/400x200'}" alt="news image" class="news-image">
-          <h2 class="news-title"><a href="${article.link}" target="_blank">${article.title}</a></h2>
-          <p class="news-summary">${article.description || 'No description available.'}</p>
-        `;
-        newsContainer.appendChild(card);
-      });
-      totalPages = Math.ceil((data.totalResults || 100) / 10) || 1;
-      if (data.nextPage && currentIndex + 1 === pageTokens.length) {
-        pageTokens.push(data.nextPage);
-      }
-      updatePagination();
-    } else {
-      newsContainer.innerHTML = `<p>No articles found for ${currentCategory} in ${currentLang}.</p>`;
-      totalPages = 1;
-      currentPage = 1;
-      updatePagination();
-    }
-  } catch (err) {
-    console.error('Error fetching news:', err);
-    newsContainer.innerHTML = `<p>Error loading news: ${err.message}</p>`;
-    totalPages = 1;
-    currentPage = 1;
-    updatePagination();
-  } finally {
-    loading.style.display = 'none';
-  }
-}
-
-// Update pagination display
-function updatePagination() {
-  if (pageInfo) pageInfo.textContent = `Page ${currentIndex + 1} of ${totalPages}`;
-  if (prevPageBtn) prevPageBtn.disabled = currentIndex === 0;
-  if (nextPageBtn) nextPageBtn.disabled = currentIndex + 1 >= totalPages || !pageTokens[currentIndex + 1];
-}
-
-// Handle search submission
+// Search Functionality
 if (searchForm) {
   searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
     currentQuery = searchInput.value.trim();
     if (currentQuery) {
-      resetPagination();
-      fetchNews();
+      currentPage = 1;
+      fetchNews(currentPage);
     } else {
       newsContainer.innerHTML = '<p>Please enter a search term.</p>';
       if (loading) loading.style.display = 'none';
@@ -196,43 +233,15 @@ if (searchForm) {
   });
 }
 
-// Pagination navigation
+// Pagination
 prevPageBtn.addEventListener('click', () => {
-  if (currentIndex > 0) {
-    currentIndex--;
-    fetchNews();
+  if (currentPage > 1) {
+    currentPage--;
+    fetchNews(currentPage);
   }
 });
 
 nextPageBtn.addEventListener('click', () => {
-  if (currentIndex + 1 < pageTokens.length) {
-    currentIndex++;
-    fetchNews();
-  }
+  currentPage++;
+  fetchNews(currentPage);
 });
-
-// YouTube player with scroll control
-let player;
-let lastScrollY = window.scrollY;
-
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    events: {
-      onReady: onPlayerReady
-    }
-  });
-}
-
-function onPlayerReady(event) {
-  window.addEventListener('scroll', () => {
-    const newScrollY = window.scrollY;
-    if (!player) return;
-
-    if (newScrollY > lastScrollY) {
-      player.pauseVideo();
-    } else if (newScrollY < lastScrollY) {
-      player.playVideo();
-    }
-    lastScrollY = newScrollY;
-  });
-}
